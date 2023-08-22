@@ -3,7 +3,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 from models.base_model import Base
-from models.base_model import BaseModel
 from os import getenv
 from models.amenity import Amenity
 from models.city import City
