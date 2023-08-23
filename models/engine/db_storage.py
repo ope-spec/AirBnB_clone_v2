@@ -10,6 +10,8 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
+from models import classes
+
 
 
 class DBStorage:
@@ -32,7 +34,6 @@ class DBStorage:
 
     def all(self, cls=None):
         """Query on the current database session"""
-        from models import classes
         result = {}
         if cls is None:
             for cls in classes.values():
@@ -60,7 +61,6 @@ class DBStorage:
 
     def reload(self):
         """Create all tables in the database"""
-        from models import classes
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
