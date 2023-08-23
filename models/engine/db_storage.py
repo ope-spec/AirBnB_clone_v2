@@ -1,16 +1,17 @@
 #!/usr/bin/python3
 """This module defines the DBStorage class for database storage"""
+# Python modules
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship
-from models.base_model import Base
 from os import getenv
-from models.amenity import Amenity
-from models.city import City
-from models.place import Place
-from models.review import Review
-from models.state import State
-from models.user import User
-from models import classes
+# console.py modules
+from models.base_model import Base, BaseModel
+# from models.amenity import Amenity
+# from models.city import City
+# from models.place import Place
+# from models.review import Review
+# from models.state import State
+# from models.user import User
 
 
 
@@ -34,18 +35,20 @@ class DBStorage:
 
     def all(self, cls=None):
         """Query on the current database session"""
-        result = {}
-        if cls is None:
-            for cls in classes.values():
-                for instance in self.__session.query(cls).all():
-                    key = '{}.{}'.format(instance.__class__.__name__, instance.id)
-                    result[key] = instance
+        objects = {}
+        if cls:
+            query = self.__session.query(cls).all()
+            for obj in query:
+                key = "{}.{}".format(type(obj).__name__, obj.id)
+                objects[key] = obj
         else:
-            for instance in self.__session.query(cls).all():
-                key = '{}.{}'.format(instance.__class__.__name__, instance.id)
-                result[key] = instance
-        return result
-
+            for cls in BaseModel.__subclasses__():
+                query = self.__session.query(cls).all()
+                for obj in query:
+                    key = "{}.{}".format(type(obj).__name__, obj.id)
+                    objects[key] = obj
+        return objects
+ 
     def new(self, obj):
         """Add the object to the current database session"""
         self.__session.add(obj)
@@ -56,16 +59,16 @@ class DBStorage:
 
     def delete(self, obj=None):
         """Delete from the current database session"""
-        if obj is not None:
+        if obj:
             self.__session.delete(obj)
 
     def reload(self):
         """Create all tables in the database"""
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        Session = scoped_session(session_factory)
-        self.__session = Session()
+        self.__session = scoped_session(
+            sessionmaker(bind=self.__engine, expire_on_commit=False))()
 
+ 
     def close(self):
         """Close the working SQLAlchemy session."""
         self.__session.close()
