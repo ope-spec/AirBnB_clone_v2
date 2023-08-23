@@ -13,3 +13,15 @@ class User(BaseModel, Base):
     first_name = Column(String(128))
     last_name = Column(String(128))
     places = relationship("Place", backref="user", cascade="all, delete")
+
+    @property
+    def places(self):
+        """ Getter method for the places linked to the user """
+        return self.places
+
+    @places.setter
+    def places(self, value):
+        """ Setter method for places linked to the user """
+        if value and not isinstance(value, list):
+            raise ValueError("Places must be a list of Place objects")
+        self.places = value
