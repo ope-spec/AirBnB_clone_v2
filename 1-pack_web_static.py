@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 """This script generates a .tgz archive from the contents of the web_static folder."""
-from fabric.api import local
+from fabric.api import local, task
+from fabric.api import run, env, put, sudo
 import time
 
 
+@task
 def do_pack():
     """
     Generates a .tgz archive from the contents of the web_static folder.
